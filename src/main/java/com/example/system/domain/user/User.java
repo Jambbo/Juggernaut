@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.scheduling.config.Task;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -30,4 +31,12 @@ public class User {
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
     private List<Request> requests;
+
+    public void addRequest(Request request){
+        if(requests==null){
+            requests = new ArrayList<>();
+        }
+        requests.add(request);
+    }
+
 }

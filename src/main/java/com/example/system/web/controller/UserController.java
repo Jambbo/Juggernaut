@@ -67,7 +67,7 @@ public class UserController {
         dto.setCreatedAt(LocalDateTime.now());
         Request request = requestMapper.toEntity(dto);
 
-        Request createdRequest = requestService.createRequest(request,id);
+        Request createdRequest = requestService.addRequestToUser(request,id);
         return requestMapper.toDto(createdRequest);
     }
     @PostMapping("/{id}/drafts")
@@ -76,11 +76,10 @@ public class UserController {
             @PathVariable Long id, @Validated(OnCreate.class)
             @RequestBody RequestDto dto
     ){
-//        dto.setUser(userService.getById(id));
-        requestService.addRequestToUser();
         dto.setCreatedAt(LocalDateTime.now());
-        Request requestDraft = requestMapper.toEntity(dto);
-        Request createdRequestDraft = requestService.createDraftRequest(requestDraft,id);
-        return requestMapper.toDto(createdRequestDraft);
+        Request request = requestMapper.toEntity(dto);
+        Request createdRequest = requestService.addRequestToUser(request,id);
+        return requestMapper.toDto(createdRequest);
+
     }
 }

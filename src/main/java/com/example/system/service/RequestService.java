@@ -10,6 +10,6 @@ public interface RequestService {
     Request update(Request request);
     Request createRequest(Request request, Long userId);
     Request createDraftRequest(Request request, Long userId);
-    void addRequestToUser(Request request, Long userId);
+    Request addRequestToUser(Request request, Long userId);
     void delete(Long id);
 }

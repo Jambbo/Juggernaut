@@ -65,19 +65,19 @@ public class RequestServiceImpl implements RequestService {
         if(request.getStatus()!=null){
             request.setStatus(Status.DRAFT);
         }
-
-        String phoneNumber = request.getPhoneNumber();
-        log.info("Saving request to db. Phone number = "+phoneNumber);
         requestRepository.save(request);
         return request;
     }
     @Override
     @Transactional
-    public void addRequestToUser(Request request,Long userId){
+    public Request addRequestToUser(Request request,Long userId){
         User user = userRepository.findById(userId).orElseThrow();
-        user.getRequests().add(request);
+        user.addRequest(request);
         userRepository.save(user);
+        int size = user.getRequests().size();
+        return user.getRequests().get(size-1);
     }
+
 
 
     @Override

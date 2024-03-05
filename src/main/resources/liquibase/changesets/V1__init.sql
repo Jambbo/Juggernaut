@@ -12,8 +12,8 @@ create table if not exists requests
     text         varchar(255) not null,
     status       varchar(255) not null,
     phone_number varchar(255) not null,
-    user_id      bigint       not null,
-    constraint fk_users_requests_user foreign key (user_id) references users(id) on delete cascade on update no action ,
+    user_id      bigint    default null,
+    constraint fk_users_requests_user foreign key (user_id) references users (id) on delete cascade on update no action,
     created_at   timestamp default current_timestamp
 );
 
