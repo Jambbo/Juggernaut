@@ -7,22 +7,24 @@ create table if not exists users
 );
 create table if not exists requests
 (
-    id          bigserial primary key,
-    title       varchar(255) not null,
-    text        varchar(255) not null,
-    status      varchar(255) not null,
-    phone_number varchar(255),
-    created_at   timestamp   default current_timestamp
+    id           bigserial primary key,
+    title        varchar(255) not null,
+    text         varchar(255) not null,
+    status       varchar(255) not null,
+    phone_number varchar(255) not null,
+    user_id      bigint       not null,
+    constraint fk_users_requests_user foreign key (user_id) references users(id) on delete cascade on update no action ,
+    created_at   timestamp default current_timestamp
 );
 
-create table if not exists users_requests
-(
-    user_id    bigint not null,
-    request_id bigint not null,
-    primary key (user_id, request_id),
-    constraint fk_users_requests_users foreign key (user_id) references users (id) on delete cascade on update no action,
-    constraint fk_users_requests_requests foreign key (request_id) references requests (id) on delete cascade on update no action
-);
+-- create table if not exists users_requests
+-- (
+--     user_id    bigint not null,
+--     request_id bigint not null,
+--     primary key (user_id, request_id),
+--     constraint fk_users_requests_users foreign key (user_id) references users (id) on delete cascade on update no action,
+--     constraint fk_users_users_requests foreign key (request_id) references requests (id) on delete cascade on update no action
+-- );
 create table if not exists users_roles
 (
     user_id bigint       not null,

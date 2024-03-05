@@ -1,5 +1,6 @@
 package com.example.system.domain.request;
 
+import com.example.system.domain.user.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,7 +24,10 @@ public class Request {
     @Column(name = "phone_number")
     private String phoneNumber;
 
+//    @ManyToOne
+//    @JoinColumn(name = "user_id")
+//    private User user;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
-
 }

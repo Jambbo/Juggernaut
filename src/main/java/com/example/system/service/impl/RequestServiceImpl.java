@@ -2,19 +2,25 @@ package com.example.system.service.impl;
 
 import com.example.system.domain.request.Request;
 import com.example.system.domain.request.Status;
+import com.example.system.domain.user.User;
 import com.example.system.repository.RequestRepository;
+import com.example.system.repository.UserRepository;
 import com.example.system.service.RequestService;
+import com.example.system.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class RequestServiceImpl implements RequestService {
 
     private final RequestRepository requestRepository;
+    private final UserRepository userRepository;
     @Override
     public Request getById(Long requestId){
         return requestRepository.findById(requestId)
@@ -59,8 +65,18 @@ public class RequestServiceImpl implements RequestService {
         if(request.getStatus()!=null){
             request.setStatus(Status.DRAFT);
         }
+
+        String phoneNumber = request.getPhoneNumber();
+        log.info("Saving request to db. Phone number = "+phoneNumber);
         requestRepository.save(request);
         return request;
+    }
+    @Override
+    @Transactional
+    public void addRequestToUser(Request request,Long userId){
+        User user = userRepository.findById(userId).orElseThrow();
+        user.getRequests().add(request);
+        userRepository.save(user);
     }
 
 

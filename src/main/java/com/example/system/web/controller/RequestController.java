@@ -19,7 +19,7 @@ public class RequestController {
     private final RequestMapper requestMapper;
 
     @PutMapping
-    @PreAuthorize("@customSecurityExpression.canEditRequest(#dto.id)")
+    @PreAuthorize("@customSecurityExpression.canAccessUser(#dto.id)")
     public RequestDto update(@Validated(OnUpdate.class)
                              @RequestBody RequestDto dto){
         Request request = requestMapper.toEntity(dto);

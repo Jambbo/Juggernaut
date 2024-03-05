@@ -27,8 +27,7 @@ public class User {
     @Enumerated(value = EnumType.STRING)
     private Set<Role> roles;
 
-    @CollectionTable(name = "users_requests")
-    @OneToMany
-    @JoinColumn(name = "request_id")
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id")
     private List<Request> requests;
 }

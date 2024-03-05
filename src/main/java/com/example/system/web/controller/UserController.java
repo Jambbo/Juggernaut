@@ -11,6 +11,7 @@ import com.example.system.web.dto.validation.OnUpdate;
 import com.example.system.web.mappers.RequestMapper;
 import com.example.system.web.mappers.UserMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +23,7 @@ import java.util.List;
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
 @Validated
+@Slf4j
 public class UserController {
 
     private final UserService userService;
@@ -50,6 +52,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}/requests")
+    @PostMapping()
     @PreAuthorize("@customSecurityExpression.canAccessUser(#id)")
     public List<RequestDto> getRequestByUserId(@PathVariable Long id){
         List<Request> requests = requestService.getAllByUserId(id);
@@ -63,6 +66,7 @@ public class UserController {
     ){
         dto.setCreatedAt(LocalDateTime.now());
         Request request = requestMapper.toEntity(dto);
+
         Request createdRequest = requestService.createRequest(request,id);
         return requestMapper.toDto(createdRequest);
     }
@@ -72,6 +76,8 @@ public class UserController {
             @PathVariable Long id, @Validated(OnCreate.class)
             @RequestBody RequestDto dto
     ){
+//        dto.setUser(userService.getById(id));
+        requestService.addRequestToUser();
         dto.setCreatedAt(LocalDateTime.now());
         Request requestDraft = requestMapper.toEntity(dto);
         Request createdRequestDraft = requestService.createDraftRequest(requestDraft,id);
