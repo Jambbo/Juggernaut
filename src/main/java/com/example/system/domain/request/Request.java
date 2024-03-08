@@ -30,4 +30,5 @@ public class Request {
 
     @CreationTimestamp
     private LocalDateTime createdAt;
+    private String createdBy;
 }

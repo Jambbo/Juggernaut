@@ -45,7 +45,7 @@ public class CustomSecurityExpression {
     public boolean canAccessRequest(Long requestId){
         JwtEntity user = getPrincipal();
         Long userId = user.getId();
-        return userService.isRequestOwner(userId, requestId);
+        return userService.isRequestOwner(userId, requestId) && hasAnyRole(Role.USER);
     }
     public boolean canAccessUserList() {
         JwtEntity user = getPrincipal();
@@ -58,7 +58,7 @@ public class CustomSecurityExpression {
     }
 
 
-    private JwtEntity getPrincipal() {
+    public JwtEntity getPrincipal() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return (JwtEntity) authentication.getPrincipal();
     }

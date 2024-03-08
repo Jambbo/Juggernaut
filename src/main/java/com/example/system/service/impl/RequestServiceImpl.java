@@ -6,7 +6,9 @@ import com.example.system.domain.user.User;
 import com.example.system.repository.RequestRepository;
 import com.example.system.repository.UserRepository;
 import com.example.system.service.RequestService;
-import com.example.system.service.UserService;
+import com.example.system.web.dto.request.RequestDto;
+import com.example.system.web.security.JwtEntity;
+import com.example.system.web.security.expression.CustomSecurityExpression;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -15,8 +17,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Pageable;
+import com.example.system.web.mappers.RequestMapper;
 
-import java.util.List;
+import java.time.LocalDateTime;
 
 @Service
 @Slf4j
@@ -25,18 +28,79 @@ public class RequestServiceImpl implements RequestService {
 
     private final RequestRepository requestRepository;
     private final UserRepository userRepository;
+    private final RequestMapper requestMapper;
+    private final CustomSecurityExpression customSecurityExpression;
+
     @Override
-    public Request getById(Long requestId){
+    public Request getRequestById(Long requestId){
         return requestRepository.findById(requestId)
                 .orElseThrow(
                         ()->new IllegalStateException("Request not found.")
                 );
     }
     @Override
-    public List<Request> getRequests(int pageNo, int pageSize, String sortBy, String sortOrder) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.Direction.fromString(sortOrder), sortBy);
-        Page<Request> page = requestRepository.findAll(pageable);
-        return page.getContent();
+    public Page<RequestDto> findRequestsCreatedBy(String sortBy, String order, int page, int size) {
+        JwtEntity currentUser = customSecurityExpression.getPrincipal();
+        Long userId = currentUser.getId();
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sortBy));
+        Page<Request> requests = requestRepository.findAll(pageable);
+
+        return requests.map(request -> {
+            RequestDto requestDto = new RequestDto();
+            requestDto.setId(request.getId());
+            requestDto.setTitle(request.getTitle());
+            requestDto.setText(request.getText());
+            requestDto.setPhoneNumber(request.getPhoneNumber());
+            requestDto.setStatus(request.getStatus());
+            requestDto.setCreatedAt(request.getCreatedAt());
+            return requestDto;
+        });
+    }
+    @Override
+    public Page<RequestDto> findAllRequestsSortedByDate(String sortBy, String order, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sortBy));
+        Page<Request> requests = requestRepository.findAllByStatus(Status.SENT,pageable);
+
+        return requests.map(request -> {
+            RequestDto requestDto = new RequestDto();
+            requestDto.setId(request.getId());
+            requestDto.setTitle(request.getTitle());
+            requestDto.setText(request.getText());
+            requestDto.setPhoneNumber(request.getPhoneNumber());
+            requestDto.setStatus(request.getStatus());
+            requestDto.setCreatedAt(request.getCreatedAt());
+            return requestDto;
+        });
+    }
+    @Override
+    public Page<RequestDto> findByCreatedByContainingIgnoreCaseAndStatus(String createdBy,Status status, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Request> requests =  requestRepository.findByCreatedByContainingIgnoreCaseAndStatus(createdBy, status,pageable);
+
+        return requests.map(request -> {
+            RequestDto requestDto = new RequestDto();
+            requestDto.setId(request.getId());
+            requestDto.setTitle(request.getTitle());
+            requestDto.setText(request.getText());
+            requestDto.setPhoneNumber(request.getPhoneNumber());
+            requestDto.setStatus(request.getStatus());
+            requestDto.setCreatedAt(request.getCreatedAt());
+            return requestDto;
+        });
+    }
+
+    @Override
+    public void acceptRequest(Long requestId) {
+        Request request = getRequestById(requestId);
+        request.setStatus(Status.ACCEPTED);
+        requestRepository.save(request);
+    }
+    @Override
+    public void rejectRequest(Long requestId) {
+        Request request = getRequestById(requestId);
+        request.setStatus(Status.REJECTED);
+        requestRepository.save(request);
     }
 
 //    @Override
@@ -47,16 +111,30 @@ public class RequestServiceImpl implements RequestService {
     @Override
     @Transactional
     public Request update(Request request) {
-        Request existing = getById(request.getId());
+        Request existing = getRequestById(request.getId());
        if(existing.getStatus()==Status.DRAFT){
            existing.setTitle(request.getTitle());
            existing.setText(request.getText());
            existing.setPhoneNumber(request.getPhoneNumber());
            requestRepository.save(existing);
        }else{
-           throw new IllegalStateException("You can not change sent requests.");
+           throw new IllegalStateException("You can not change sent reques5ts.");
        }
        return request;
+    }
+
+    @Override
+    @Transactional
+    public Request sendRequestToOperator(Request request,Long userId) {
+        request.setStatus(Status.SENT);
+        request.setCreatedAt(LocalDateTime.now());
+        User user = userRepository.findById(userId).orElseThrow(
+                ()->new RuntimeException("User not found.")
+        );
+        request.setCreatedBy(user.getName());
+        request.setUser(user);
+        requestRepository.save(request);
+        return request;
     }
 
     @Override
@@ -83,6 +161,7 @@ public class RequestServiceImpl implements RequestService {
     public Request addRequestToUser(Request request,Long userId){
         User user = userRepository.findById(userId).orElseThrow();
         user.addRequest(request);
+        request.setCreatedBy(user.getName());
         userRepository.save(user);
         int size = user.getRequests().size();
         return user.getRequests().get(size-1);

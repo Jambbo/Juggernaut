@@ -71,7 +71,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean isRequestDraft(Long userId, Long requestId){
         User user = getById(userId);
-        Request request = requestService.getById(requestId);
+        Request request = requestService.getRequestById(requestId);
         return request.getStatus().equals(Status.DRAFT) && user.getRequests().contains(request);
     }
 

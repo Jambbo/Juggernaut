@@ -1,5 +1,6 @@
 package com.example.system.web.dto.request;
 
+import com.example.system.domain.request.Request;
 import com.example.system.domain.request.Status;
 import com.example.system.domain.user.User;
 import com.example.system.web.dto.validation.OnCreate;
@@ -34,4 +35,18 @@ public class RequestDto {
     @DateTimeFormat(iso = DateTimeFormat.ISO.TIME)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime createdAt;
+
+    public static RequestDto fromEntity(Request request) {
+        RequestDto requestDto = new RequestDto();
+        requestDto.setId(request.getId());
+        requestDto.setTitle(request.getTitle());
+        requestDto.setText(request.getText());
+        requestDto.setPhoneNumber(request.getPhoneNumber());
+        requestDto.setStatus(request.getStatus());
+        requestDto.setCreatedAt(request.getCreatedAt());
+        return requestDto;
+    }
+
+//    @Length(max = 255, message = "Name must be smaller than 255 symbols.", groups = {OnCreate.class, OnUpdate.class})
+//    private String createdBy;
 }

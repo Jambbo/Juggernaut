@@ -14,7 +14,8 @@ create table if not exists requests
     phone_number varchar(255) not null,
     user_id      bigint    default null,
     constraint fk_users_requests_user foreign key (user_id) references users (id) on delete cascade on update no action,
-    created_at   timestamp default current_timestamp
+    created_at   timestamp default current_timestamp,
+    created_by   varchar(255) not null
 );
 
 -- create table if not exists users_requests
