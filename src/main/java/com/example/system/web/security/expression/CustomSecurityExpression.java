@@ -1,5 +1,6 @@
 package com.example.system.web.security.expression;
 
+import com.example.system.domain.request.Status;
 import com.example.system.domain.user.Role;
 import com.example.system.service.RequestService;
 import com.example.system.service.UserService;
@@ -42,7 +43,6 @@ public class CustomSecurityExpression {
     }
 
     public boolean canAccessRequest(Long requestId){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         JwtEntity user = getPrincipal();
         Long userId = user.getId();
         return userService.isRequestOwner(userId, requestId);

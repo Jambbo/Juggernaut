@@ -24,13 +24,6 @@ public interface UserRepository extends JpaRepository<User,Long> {
             """,nativeQuery = true)
     Optional<User> findRequestAuthor(@Param("requestId")Long requestId);
 
-    @Query(value = """
-                SELECT exists(
-                 SELECT 1
-                 FROM users_requests
-                 WHERE user_id= :userId
-                 AND request_id = :requestId           
-                            )
-            """,nativeQuery = true)
+    @Query("SELECT CASE WHEN COUNT(r) > 0 THEN true ELSE false END FROM Request r WHERE r.id = :requestId AND r.user.id = :userId")
     boolean isRequestOwner(@Param("userId")Long userId, @Param("requestId")Long requestId);
 }

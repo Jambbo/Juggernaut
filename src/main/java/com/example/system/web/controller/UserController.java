@@ -51,13 +51,13 @@ public class UserController {
         userService.delete(id);
     }
 
-    @GetMapping("/{id}/requests")
-    @PostMapping()
-    @PreAuthorize("@customSecurityExpression.canAccessUser(#id)")
-    public List<RequestDto> getRequestByUserId(@PathVariable Long id){
-        List<Request> requests = requestService.getAllByUserId(id);
-        return requestMapper.toDto(requests);
-    }
+//    @GetMapping("/{id}/requests")
+//    @PostMapping()
+//    @PreAuthorize("@customSecurityExpression.canAccessUser(#id)")
+//    public List<RequestDto> getRequestByUserId(@PathVariable Long id){
+//        List<Request> requests = requestService.getAllByUserId(id);
+//        return requestMapper.toDto(requests);
+//    }
     @PostMapping("/{id}/requests")
     @PreAuthorize("@customSecurityExpression.canAccessUser(#id)")
     public RequestDto createRequest(

@@ -9,8 +9,12 @@ import com.example.system.service.RequestService;
 import com.example.system.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -28,11 +32,17 @@ public class RequestServiceImpl implements RequestService {
                         ()->new IllegalStateException("Request not found.")
                 );
     }
-
     @Override
-    public List<Request> getAllByUserId(Long id) {
-        return requestRepository.findAllByUserId(id);
+    public List<Request> getRequests(int pageNo, int pageSize, String sortBy, String sortOrder) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.Direction.fromString(sortOrder), sortBy);
+        Page<Request> page = requestRepository.findAll(pageable);
+        return page.getContent();
     }
+
+//    @Override
+//    public List<Request> getAllByUserId(Long id) {
+//        return requestRepository.findAllByUserId(id);
+//    }
 
     @Override
     @Transactional
