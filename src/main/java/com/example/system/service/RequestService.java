@@ -13,7 +13,7 @@ import java.util.List;
 public interface RequestService {
     Request getRequestById(Long requestId);
     Request update(Request request);
-    Page<RequestDto> findRequestsCreatedBy(String sortBy, String order, int page, int size);
+    Page<RequestDto> findRequestsCreatedByUser(Long userId, String sortBy, String order, int page, int size);
     Page<RequestDto> findAllRequestsSortedByDate(String sortBy, String order, int page, int size);
     Page<RequestDto> findByCreatedByContainingIgnoreCaseAndStatus(String createdBy, Status status, int page, int size);
     void acceptRequest(Long requestId);

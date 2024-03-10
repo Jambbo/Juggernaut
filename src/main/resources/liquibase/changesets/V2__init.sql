@@ -14,5 +14,4 @@ values('1st request','1st text','DRAFT','0984832753',2,'2024-03-02 12:00:00','Ma
 insert into users_roles (user_id, role)
 values (1, 'ADMIN'),
        (2, 'OPERATOR'),
-       (2, 'USER'),
        (3, 'USER');

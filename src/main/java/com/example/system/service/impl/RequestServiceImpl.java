@@ -11,6 +11,7 @@ import com.example.system.web.security.JwtEntity;
 import com.example.system.web.security.expression.CustomSecurityExpression;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.validator.internal.util.stereotypes.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -29,7 +30,6 @@ public class RequestServiceImpl implements RequestService {
     private final RequestRepository requestRepository;
     private final UserRepository userRepository;
     private final RequestMapper requestMapper;
-    private final CustomSecurityExpression customSecurityExpression;
 
     @Override
     public Request getRequestById(Long requestId){
@@ -39,12 +39,11 @@ public class RequestServiceImpl implements RequestService {
                 );
     }
     @Override
-    public Page<RequestDto> findRequestsCreatedBy(String sortBy, String order, int page, int size) {
-        JwtEntity currentUser = customSecurityExpression.getPrincipal();
-        Long userId = currentUser.getId();
+    public Page<RequestDto> findRequestsCreatedByUser(Long userId,String sortBy, String order, int page, int size) {
+
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sortBy));
-        Page<Request> requests = requestRepository.findAll(pageable);
+        Page<Request> requests = requestRepository.findByUserId(userId,pageable);
 
         return requests.map(request -> {
             RequestDto requestDto = new RequestDto();

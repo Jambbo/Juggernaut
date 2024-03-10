@@ -3,11 +3,14 @@ package com.example.system.web.controller;
 import com.example.system.domain.request.Request;
 import com.example.system.domain.request.Status;
 import com.example.system.domain.user.User;
+import com.example.system.service.UserService;
+import org.springframework.http.HttpHeaders;
 import com.example.system.service.RequestService;
 import com.example.system.web.dto.request.RequestDto;
 import com.example.system.web.dto.validation.OnUpdate;
 import com.example.system.web.mappers.RequestMapper;
 import com.example.system.web.security.JwtEntity;
+import com.example.system.web.security.JwtTokenProvider;
 import com.example.system.web.security.expression.CustomSecurityExpression;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -27,10 +30,11 @@ import java.util.List;
 @RequestMapping("/api/v1/requests")
 @RequiredArgsConstructor
 public class RequestController {
-
+    private final UserService userService;
     private final RequestService requestService;
     private final RequestMapper requestMapper;
     private final CustomSecurityExpression customSecurityExpression;
+    private final JwtTokenProvider jwtTokenProvider;
     @PutMapping
     @PreAuthorize("@customSecurityExpression.canAccessRequest(#dto.id)")
     public RequestDto update(@Validated(OnUpdate.class)
@@ -63,13 +67,20 @@ public class RequestController {
     }
     @GetMapping("/user/all")
     @PreAuthorize("@customSecurityExpression.hasAnyRole(T(com.example.system.domain.user.Role).USER)")
-    public ResponseEntity<Page<RequestDto>> getAllRequestsForUser(@RequestParam(defaultValue = "createdAt") String sortBy,
+    public ResponseEntity<Page<RequestDto>> getAllRequestsForUser(
+                                                                  @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader,
+                                                                  @RequestParam(defaultValue = "createdAt") String sortBy,
                                                                   @RequestParam(defaultValue = "asc") String order,
                                                                   @RequestParam(defaultValue = "0") int page,
                                                                   @RequestParam(defaultValue = "5") int size)
     {
-        Page<RequestDto> requests = requestService.findRequestsCreatedBy(sortBy, order, page, size);
-        return ResponseEntity.ok(requests);
+        String token = authorizationHeader.substring(7);
+        String username = jwtTokenProvider.getUsername(token);
+        User user = userService.getByUsername(username);
+
+
+        Page<RequestDto> userRequests = requestService.findRequestsCreatedByUser(user.getId(), sortBy, order, page, size);
+        return ResponseEntity.ok(userRequests);
     }
     @GetMapping("/search")
     @PreAuthorize("@customSecurityExpression.hasAnyRole(T(com.example.system.domain.user.Role).OPERATOR)")

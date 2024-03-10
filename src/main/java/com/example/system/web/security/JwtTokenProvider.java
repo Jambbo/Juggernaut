@@ -107,7 +107,7 @@ public class JwtTokenProvider {
                 .get("id")
                 .toString();
     }
-    private String getUsername(String token) {
+    public String getUsername(String token) {
         return Jwts
                 .parser()
                 .verifyWith(key)

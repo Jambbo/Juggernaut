@@ -12,6 +12,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -27,6 +29,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+    @Override
     public User getById(Long userId) {
         return userRepository.findById(userId).orElseThrow(()->new IllegalStateException("User not found"));
     }
@@ -37,6 +44,19 @@ public class UserServiceImpl implements UserService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
         return user;
+    }
+
+    @Override
+    @Transactional
+    public void assignRoles(Long userId, Set<Role> roles) {
+        Optional<User> opUser = userRepository.findById(userId);
+        if(opUser.isPresent()){
+            User user = opUser.get();
+            user.setRoles(roles);
+            userRepository.save(user);
+        }else{
+            throw new IllegalStateException("User not found.");
+        }
     }
 
     @Override
@@ -74,5 +94,6 @@ public class UserServiceImpl implements UserService {
         Request request = requestService.getRequestById(requestId);
         return request.getStatus().equals(Status.DRAFT) && user.getRequests().contains(request);
     }
+
 
 }

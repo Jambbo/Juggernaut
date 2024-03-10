@@ -14,9 +14,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface RequestRepository extends JpaRepository<Request, Long> {
     Page<Request> findByCreatedByContainingIgnoreCaseAndStatus(String createdBy, Status status,Pageable pageable);
-
+    Page<Request> findByUserId(Long userId,Pageable pageable);
     Page<Request> findAllByStatus(Status status, Pageable pageable);
     Request findByIdAndStatus(Long id, Status status);
-    Page<Request> findAll(Pageable pageable);
 
 }

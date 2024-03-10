@@ -11,11 +11,13 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
+
 
 //@Component("cse")
 @Service("customSecurityExpression")
 @RequiredArgsConstructor
-public class CustomSecurityExpression {
+public class CustomSecurityExpression{
 
     private final UserService userService;
 
@@ -62,5 +64,6 @@ public class CustomSecurityExpression {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return (JwtEntity) authentication.getPrincipal();
     }
+
 
 }
