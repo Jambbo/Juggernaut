@@ -25,6 +25,7 @@
         <jjwt.version>0.12.5</jjwt.version>
         <liquibase.version>4.26.0</liquibase.version>
         <preliquibase.version>1.4.0</preliquibase.version>
+        <openApi.version>2.2.0</openApi.version>
     </properties>
 
     <dependencies>
@@ -117,6 +118,16 @@
             <version>${preliquibase.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>${openApi.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
 
     </dependencies>
 

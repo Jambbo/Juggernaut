@@ -7,6 +7,7 @@ import org.springframework.scheduling.config.Task;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 @Entity
@@ -21,6 +22,9 @@ public class User {
     private String password;
     @Transient
     private String passwordConfirmation;
+    @Column(name = "authconfirmcode")
+    private String authConfirmCode;
+    private boolean confirm;
 
     @Column(name = "role")
     @ElementCollection(fetch = FetchType.EAGER)
@@ -37,6 +41,24 @@ public class User {
             requests = new ArrayList<>();
         }
         requests.add(request);
+    }
+    public void setAuthConfirmCode() {
+        String prefix = "aboba";
+        String randomCode = generateRandomCode(5); // Generate 5 random letters or digits
+        this.authConfirmCode = prefix + randomCode;
+    }
+
+    private String generateRandomCode(int length) {
+        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        Random random = new Random();
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 0; i < length; i++) {
+            int randomIndex = random.nextInt(characters.length());
+            sb.append(characters.charAt(randomIndex));
+        }
+
+        return sb.toString();
     }
 
 }

@@ -1,13 +1,16 @@
 create table if not exists users
 (
-    id       bigserial primary key,
-    name     varchar(255) not null,
-    username varchar(255) not null unique,
-    password varchar(255) not null
+    id bigserial primary key,
+    name            varchar(255) not null,
+    username        varchar(255) not null unique,
+    password        varchar(255) not null,
+    AuthConfirmCode varchar(255) unique,
+    confirm          BOOLEAN not null
+
 );
 create table if not exists requests
 (
-    id           bigserial primary key,
+    id bigserial primary key,
     title        varchar(255) not null,
     text         varchar(255) not null,
     status       varchar(255) not null,

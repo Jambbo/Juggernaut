@@ -5,6 +5,7 @@ import com.example.system.domain.request.Status;
 import com.example.system.domain.user.Role;
 import com.example.system.domain.user.User;
 import com.example.system.repository.UserRepository;
+import com.example.system.service.EmailService;
 import com.example.system.service.RequestService;
 import com.example.system.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +21,10 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final RequestService requestService;
+    private final EmailService emailService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+
     @Override
     @Transactional(readOnly = true)
     public User getByUsername(String username) {
@@ -68,10 +71,14 @@ public class UserServiceImpl implements UserService {
        if(!user.getPassword().equals(user.getPasswordConfirmation())){
            throw new IllegalStateException("Password and password confirmation do not match.");
        }
+
+       user.setAuthConfirmCode(passwordEncoder.encode(user.getAuthConfirmCode()));
        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
        Set<Role> roles = Set.of(Role.USER);
        user.setRoles(roles);
        userRepository.save(user);
+        emailService.sendMailTo(user.getUsername(), "http://localhost:8080/api/v1/users/emailConfirmation/"+user.getId()+"/"+ user.getAuthConfirmCode());
        return user;
     }
 
