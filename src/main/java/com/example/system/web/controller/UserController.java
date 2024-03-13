@@ -37,17 +37,19 @@ public class UserController {
 
     @PutMapping
     @PreAuthorize("@customSecurityExpression.canAccessUser(#dto.id) and @customSecurityExpression.hasAnyRole(T(com.example.system.domain.user.Role).USER)")
-    public UserDto update(@Validated(OnUpdate.class)@RequestBody UserDto dto){
+    public UserDto update(@Validated(OnUpdate.class) @RequestBody UserDto dto) {
         User user = userMapper.toEntity(dto);
         User updatedUser = userService.update(user);
         return userMapper.toDto(updatedUser);
     }
+
     @GetMapping("/{id}")
     @PreAuthorize("@customSecurityExpression.canAccessUser(#id) and @customSecurityExpression.hasAnyRole(T(com.example.system.domain.user.Role).USER)")
-    public UserDto getById(@PathVariable Long id){
+    public UserDto getById(@PathVariable Long id) {
         User user = userService.getById(id);
         return userMapper.toDto(user);
     }
+
     @PutMapping("/{userId}/roles")
     @PreAuthorize("@customSecurityExpression.hasAnyRole(T(com.example.system.domain.user.Role).ADMIN)")
     public ResponseEntity<Void> assignRolesToUser(@PathVariable Long userId, @RequestParam Set<Role> roles) {
@@ -55,13 +57,23 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
+    @GetMapping("/emailConfirmation/{id}/{confirmCode}")
+    public User confirm(@PathVariable("confirmCode") String authConfirmCode, @PathVariable("id") long id) {
+        User user = userService.getById(id);
+        if (user.getAuthConfirmCode().equals(authConfirmCode)) {
+            user.setConfirm(true);
+            userService.update(user);
+        } else return null;
+        return user;
+    }
+
     @DeleteMapping("/{id}")
     @PreAuthorize("@customSecurityExpression.canAccessUser(#id) and @customSecurityExpression.hasAnyRole(T(com.example.system.domain.user.Role).USER)")
-    public void deleteById(@PathVariable Long id){
+    public void deleteById(@PathVariable Long id) {
         userService.delete(id);
     }
 
-//    @GetMapping("/{id}/requests")
+    //    @GetMapping("/{id}/requests")
 //    @PostMapping()
 //    @PreAuthorize("@customSecurityExpression.canAccessUser(#id)")
 //    public List<RequestDto> getRequestByUserId(@PathVariable Long id){
@@ -72,29 +84,31 @@ public class UserController {
     @PreAuthorize("@customSecurityExpression.canAccessUser(#id) and @customSecurityExpression.hasAnyRole(T(com.example.system.domain.user.Role).USER)")
     public RequestDto createRequest(
             @PathVariable Long id, @Validated(OnCreate.class)
-            @RequestBody RequestDto dto
-    ){
+    @RequestBody RequestDto dto
+    ) {
         dto.setCreatedAt(LocalDateTime.now());
         Request request = requestMapper.toEntity(dto);
 
-        Request createdRequest = requestService.addRequestToUser(request,id);
+        Request createdRequest = requestService.addRequestToUser(request, id);
         return requestMapper.toDto(createdRequest);
     }
+
     @PostMapping("/{id}/drafts")
     @PreAuthorize("@customSecurityExpression.canAccessUser(#id) and @customSecurityExpression.hasAnyRole(T(com.example.system.domain.user.Role).USER)")
     public RequestDto createDraft(
             @PathVariable Long id, @Validated(OnCreate.class)
-            @RequestBody RequestDto dto
-    ){
+    @RequestBody RequestDto dto
+    ) {
         dto.setCreatedAt(LocalDateTime.now());
         Request request = requestMapper.toEntity(dto);
-        Request createdRequest = requestService.addRequestToUser(request,id);
+        Request createdRequest = requestService.addRequestToUser(request, id);
         return requestMapper.toDto(createdRequest);
 
     }
+
     @GetMapping("/all-users")
     @PreAuthorize("@customSecurityExpression.hasAnyRole(T(com.example.system.domain.user.Role).ADMIN)")
-    public List<UserDto> getAllUsers(){
+    public List<UserDto> getAllUsers() {
         List<User> users = userService.getAllUsers();
         return userMapper.toDto(users);
     }

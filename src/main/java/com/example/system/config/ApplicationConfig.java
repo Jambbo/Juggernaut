@@ -22,6 +22,13 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
+
+
 
 @Configuration
 @EnableWebSecurity
@@ -39,11 +46,30 @@ public class ApplicationConfig {
     }
 
 
+
     @Bean
     @SneakyThrows
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration){
         return configuration.getAuthenticationManager();
     }
+//    @Bean
+//    public OpenAPI openAPI() {
+//        return new OpenAPI()
+//                .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
+//                .components(new Components()
+//                        .addSecuritySchemes("bearerAuth",
+//                                new SecurityScheme()
+//                                        .type(SecurityScheme.Type.HTTP)
+//                                        .scheme("bearer")
+//                                        .bearerFormat("JWT")
+//                        )
+//                )
+//                .info(new Info()
+//                        .title("Task list API")
+//                        .description("Demo Spring Boot application")
+//                        .version("1.0")
+//                );
+//    }
 
     @Bean
     @SneakyThrows
@@ -69,13 +95,17 @@ public class ApplicationConfig {
                                     response.getWriter()
                                             .write("Unauthorized.");
                                 }))
-                .authorizeHttpRequests(configurer ->
-                        configurer.requestMatchers("/api/v1/auth/**")
-                                .permitAll()
-                                .anyRequest().authenticated())
+//                .authorizeHttpRequests(configurer ->
+//                        configurer.requestMatchers("/api/v1/auth/**","/v3/api-docs/**","/swagger-ui/**", "/swagger-ui.html","http://localhost:8080/api/v1/users/**")
+//                                .permitAll()
+//                                .anyRequest().authenticated())
                 .anonymous(AbstractHttpConfigurer::disable)
                 .addFilterBefore(new JwtTokenFilter(tokenProvider),
                         UsernamePasswordAuthenticationFilter.class);
         return httpSecurity.build();
     }
+
+
+
+
 }

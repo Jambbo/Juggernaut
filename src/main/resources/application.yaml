@@ -1,4 +1,14 @@
 spring:
+  mail:
+    host: smtp.gmail.com
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          starttls:
+            enable: true
+          auth: true
   config:
     import: optional:file:.env[.properties]
   datasource:
