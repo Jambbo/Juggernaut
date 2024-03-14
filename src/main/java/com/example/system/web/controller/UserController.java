@@ -11,6 +11,7 @@ import com.example.system.web.dto.validation.OnCreate;
 import com.example.system.web.dto.validation.OnUpdate;
 import com.example.system.web.mappers.RequestMapper;
 import com.example.system.web.mappers.UserMapper;
+import com.example.system.web.security.JwtEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -57,15 +58,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @GetMapping("/emailConfirmation/{id}/{confirmCode}")
-    public User confirm(@PathVariable("confirmCode") String authConfirmCode, @PathVariable("id") long id) {
-        User user = userService.getById(id);
-        if (user.getAuthConfirmCode().equals(authConfirmCode)) {
-            user.setConfirm(true);
-            userService.update(user);
-        } else return null;
-        return user;
-    }
+
 
     @DeleteMapping("/{id}")
     @PreAuthorize("@customSecurityExpression.canAccessUser(#id) and @customSecurityExpression.hasAnyRole(T(com.example.system.domain.user.Role).USER)")

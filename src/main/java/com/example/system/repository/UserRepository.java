@@ -15,4 +15,6 @@ public interface UserRepository extends JpaRepository<User,Long> {
 
     @Query("SELECT CASE WHEN COUNT(r) > 0 THEN true ELSE false END FROM Request r WHERE r.id = :requestId AND r.user.id = :userId")
     boolean isRequestOwner(@Param("userId")Long userId, @Param("requestId")Long requestId);
+
+    Optional<User> findByAuthConfirmCode(String authConfirmCode);
 }

@@ -80,6 +80,10 @@ public class ApplicationConfig {
                 .sessionManagement(sessionManagament ->
                         sessionManagament.sessionCreationPolicy(
                                 SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(configurer ->
+                        configurer.requestMatchers("/api/v1/auth/**","/v3/api-docs/**","/swagger-ui/**", "/swagger-ui.html","/emailConfirmation/**")
+                                .permitAll()
+                                .anyRequest().authenticated())
                 .exceptionHandling(configurer ->
                         configurer.authenticationEntryPoint(
                                 (request, response, authException) -> {
@@ -95,10 +99,7 @@ public class ApplicationConfig {
                                     response.getWriter()
                                             .write("Unauthorized.");
                                 }))
-//                .authorizeHttpRequests(configurer ->
-//                        configurer.requestMatchers("/api/v1/auth/**","/v3/api-docs/**","/swagger-ui/**", "/swagger-ui.html","http://localhost:8080/api/v1/users/**")
-//                                .permitAll()
-//                                .anyRequest().authenticated())
+
                 .anonymous(AbstractHttpConfigurer::disable)
                 .addFilterBefore(new JwtTokenFilter(tokenProvider),
                         UsernamePasswordAuthenticationFilter.class);

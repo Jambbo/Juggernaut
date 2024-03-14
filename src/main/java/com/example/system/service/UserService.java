@@ -21,5 +21,6 @@ public interface UserService {
 
     void delete(Long id);
 
+    User getByAuthConfirmCode(String authConfirmCode);
     boolean isRequestDraft(Long id, Long requestId);
 }

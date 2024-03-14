@@ -29,6 +29,7 @@ create table if not exists requests
 --     constraint fk_users_requests_users foreign key (user_id) references users (id) on delete cascade on update no action,
 --     constraint fk_users_users_requests foreign key (request_id) references requests (id) on delete cascade on update no action
 -- );
+
 create table if not exists users_roles
 (
     user_id bigint       not null,

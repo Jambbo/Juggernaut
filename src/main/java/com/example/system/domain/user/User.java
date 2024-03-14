@@ -3,7 +3,6 @@ package com.example.system.domain.user;
 import com.example.system.domain.request.Request;
 import jakarta.persistence.*;
 import lombok.Data;
-import org.springframework.scheduling.config.Task;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,16 +43,16 @@ public class User {
     }
     public void setAuthConfirmCode() {
         String prefix = "aboba";
-        String randomCode = generateRandomCode(5); // Generate 5 random letters or digits
+        String randomCode = generateRandomCode(); // Generate 5 random letters or digits
         this.authConfirmCode = prefix + randomCode;
     }
 
-    private String generateRandomCode(int length) {
+    private String generateRandomCode() {
         String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         Random random = new Random();
         StringBuilder sb = new StringBuilder();
 
-        for (int i = 0; i < length; i++) {
+        for (int i = 0; i < 5; i++) {
             int randomIndex = random.nextInt(characters.length());
             sb.append(characters.charAt(randomIndex));
         }

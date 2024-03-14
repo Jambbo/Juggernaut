@@ -130,6 +130,9 @@ public class RequestServiceImpl implements RequestService {
         User user = userRepository.findById(userId).orElseThrow(
                 ()->new RuntimeException("User not found.")
         );
+        if(!user.isConfirm()){
+            throw new IllegalStateException("User have not verified gmail.");
+        }
         request.setCreatedBy(user.getName());
         request.setUser(user);
         requestRepository.save(request);

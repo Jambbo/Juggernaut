@@ -13,9 +13,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.lang.reflect.Executable;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +28,6 @@ public class UserServiceImpl implements UserService {
     private final EmailService emailService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-
     @Override
     @Transactional(readOnly = true)
     public User getByUsername(String username) {
@@ -78,7 +81,7 @@ public class UserServiceImpl implements UserService {
        Set<Role> roles = Set.of(Role.USER);
        user.setRoles(roles);
        userRepository.save(user);
-        emailService.sendMailTo(user.getUsername(), "http://localhost:8080/api/v1/users/emailConfirmation/"+user.getId()+"/"+ user.getAuthConfirmCode());
+        emailService.sendMailTo(user.getUsername(), "http://localhost:8080/emailConfirmation/"+ user.getAuthConfirmCode());
        return user;
     }
 
@@ -93,6 +96,13 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void delete(Long id) {
         userRepository.deleteById(id);
+    }
+
+    @Override
+    public User getByAuthConfirmCode(String authConfirmCode) {
+        return userRepository.findByAuthConfirmCode(authConfirmCode).orElseThrow(
+                ()->new RuntimeException("User not found.")
+        );
     }
 
     @Override
